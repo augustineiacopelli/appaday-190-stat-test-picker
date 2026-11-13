@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="apple-touch-icon" href="https://augustineiacopelli.github.io/appaday/icons/190.png">
+<meta name="apple-mobile-web-app-title" content="Test Picker">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/190.webmanifest">
+<script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<script src="https://augustineiacopelli.github.io/appaday/models.js"></script>
+<script src="https://augustineiacopelli.github.io/appaday/keys.js" data-app="190" data-accent="#1F7A8C" defer></script>
+<title>Stat Test Picker | AppADay 190</title>
+<meta name="description" content="Answer five plain language questions about your study and get the right statistical test, its assumptions, a nonparametric fallback, and a short explanation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0E10;
+  --panel:#13181B;
+  --panel2:#1A2125;
+  --edge:#2A343A;
+  --ink:#E8EEF0;
+  --dim:#9AA8AE;
+  --accent:#1F7A8C;
+  --tint:#6FC3D3;
+  --warn:#E0A458;
+  --radius:0.9rem;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100dvh;display:flex;flex-direction:column;
+  background:radial-gradient(120% 60% at 50% -10%,#123038 0%,var(--bg) 60%);
+  background-color:var(--bg);color:var(--ink);
+  font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:1rem;line-height:1.5;
+}
+a{color:var(--tint)}
+button{font:inherit;color:inherit}
+.hdr{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border-bottom:1px solid var(--edge)}
+.brand{flex:1;min-width:0}
+.brand h1{margin:0;font-family:'IBM Plex Sans Condensed',sans-serif;font-weight:700;font-size:clamp(1.25rem,1rem + 1.2vw,1.75rem);letter-spacing:0.01em}
+.brand h1 span{color:var(--tint)}
+.brand a{font-size:0.8rem;color:var(--dim);text-decoration:none}
+.brand a:hover,.brand a:focus-visible{color:var(--tint)}
+.gear{min-width:2.75rem;min-height:2.75rem;border-radius:50%;border:1px solid var(--edge);background:var(--panel);cursor:pointer;display:grid;place-items:center}
+.gear:hover,.gear:focus-visible{border-color:var(--tint)}
+.gear svg{width:1.3rem;height:1.3rem;stroke:var(--ink)}
+main{flex:1;display:flex;flex-direction:column;align-items:center;padding:1rem;gap:1rem}
+.wrap{width:100%;max-width:42rem;display:flex;flex-direction:column;gap:1rem}
+.topbar{display:flex;align-items:center;gap:0.75rem;min-height:2.75rem}
+.back{min-height:2.75rem;padding:0 1rem;border-radius:2rem;border:1px solid var(--edge);background:var(--panel);cursor:pointer}
+.back:hover,.back:focus-visible{border-color:var(--tint)}
+.back[hidden]{display:none}
+.dots{display:flex;gap:0.45rem;margin-left:auto;align-items:center}
+.dot{width:0.65rem;height:0.65rem;border-radius:50%;background:var(--edge);transition:background .25s,transform .25s}
+.dot.done{background:var(--accent)}
+.dot.now{background:var(--tint);transform:scale(1.3)}
+.stage{position:relative}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:var(--radius);padding:1.25rem;transition:opacity .22s ease,transform .22s ease}
+.card.fade{opacity:0;transform:translateY(0.5rem)}
+.step-label{font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--tint);margin:0 0 0.35rem}
+.prompt{font-family:'IBM Plex Sans Condensed',sans-serif;font-weight:600;font-size:clamp(1.3rem,1.1rem + 1vw,1.7rem);line-height:1.25;margin:0 0 1rem}
+.prompt:focus,.band h2:focus{outline:none}
+.sub{font-weight:600;margin:1.1rem 0 0.5rem;font-size:1rem}
+.sub:first-of-type{margin-top:0}
+.opts{display:flex;flex-direction:column;gap:0.6rem}
+.opts.row{flex-direction:row;flex-wrap:wrap}
+.opts.row .opt{flex:1 1 6rem;min-height:3.5rem;text-align:center;justify-content:center}
+.opt{display:flex;flex-direction:column;justify-content:center;gap:0.15rem;min-height:3.5rem;width:100%;padding:0.7rem 1rem;text-align:left;border-radius:0.7rem;border:1px solid var(--edge);background:var(--panel2);cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover,.opt:focus-visible{border-color:var(--tint);outline:none}
+.opt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt[aria-pressed="true"] .help{color:#E6F4F7}
+.opt b{font-weight:600;font-size:1.02rem}
+.help{font-size:0.86rem;color:var(--dim)}
+.next{margin-top:1.1rem;width:100%;min-height:3.5rem;border-radius:0.7rem;border:0;background:var(--accent);color:#fff;font-weight:600;font-size:1.05rem;cursor:pointer}
+.next:disabled{background:var(--edge);color:var(--dim);cursor:not-allowed}
+.result{padding:0;overflow:hidden}
+.band{background:var(--accent);color:#fff;padding:1.1rem 1.25rem}
+.band .k{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.85}
+.band h2{margin:0.15rem 0 0;font-family:'IBM Plex Sans Condensed',sans-serif;font-size:clamp(1.5rem,1.2rem + 1.4vw,2.1rem);line-height:1.15}
+.band .alt{margin-top:0.35rem;font-size:0.9rem;color:#E6F4F7}
+.rbody{padding:1.1rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+.sec h3{margin:0 0 0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--tint);font-weight:600}
+.why{margin:0;font-size:1.02rem}
+.badge{display:inline-block;margin-right:0.4rem;padding:0.05rem 0.45rem;border-radius:0.35rem;background:var(--accent);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;font-weight:600;vertical-align:0.1em}
+.muted{margin:0.4rem 0 0;font-size:0.82rem;color:var(--dim)}
+.muted[hidden]{display:none}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.4rem}
+.checks li{display:flex;gap:0.6rem;align-items:flex-start}
+.checks label{display:flex;gap:0.6rem;align-items:flex-start;cursor:pointer;min-height:2.75rem;padding-top:0.55rem}
+.checks input{width:1.25rem;height:1.25rem;margin:0.1rem 0 0;accent-color:var(--accent);flex:none}
+.note{margin:0;padding:0.7rem 0.9rem;border-left:3px solid var(--warn);background:rgba(224,164,88,0.08);border-radius:0 0.5rem 0.5rem 0;font-size:0.92rem}
+.note[hidden]{display:none}
+.fb{margin:0}
+.fb strong{color:var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:0.5rem}
+.chip{min-height:2.75rem;padding:0.35rem 0.85rem;border-radius:2rem;border:1px solid var(--edge);background:var(--panel2);cursor:pointer;font-size:0.88rem;text-align:left}
+.chip:hover,.chip:focus-visible{border-color:var(--tint);color:var(--tint);outline:none}
+.chip small{display:block;font-family:'IBM Plex Mono',monospace;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim)}
+.actions{display:flex;flex-wrap:wrap;gap:0.6rem}
+.btn{flex:1 1 9rem;min-height:3rem;border-radius:0.7rem;border:1px solid var(--edge);background:var(--panel);cursor:pointer;font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover,.btn:focus-visible{border-color:var(--tint)}
+.toggle{display:flex;align-items:center;gap:0.75rem;min-height:2.75rem;cursor:pointer;color:var(--dim);font-size:0.92rem}
+.toggle input{width:1.25rem;height:1.25rem;accent-color:var(--accent)}
+.toast{min-height:1.4rem;font-size:0.88rem;color:var(--tint);text-align:center}
+.intro{color:var(--dim);font-size:0.92rem;margin:0}
+.ftr{padding:1rem;border-top:1px solid var(--edge);text-align:center;font-size:0.82rem;color:var(--dim)}
+dialog{width:min(92vw,30rem);border:1px solid var(--edge);border-radius:var(--radius);background:var(--panel);color:var(--ink);padding:0}
+dialog::backdrop{background:rgba(0,0,0,0.65)}
+.dlg-h{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--edge)}
+.dlg-h h2{margin:0;font-family:'IBM Plex Sans Condensed',sans-serif;font-size:1.3rem}
+.dlg-b{padding:1rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+.field label{display:block;font-size:0.85rem;color:var(--dim);margin-bottom:0.35rem}
+.field input{width:100%;min-height:2.9rem;padding:0 0.8rem;border-radius:0.6rem;border:1px solid var(--edge);background:var(--panel2);color:var(--ink);font:inherit}
+.field input:focus{outline:2px solid var(--tint);outline-offset:1px}
+.x{min-width:2.75rem;min-height:2.75rem;border-radius:50%;border:1px solid var(--edge);background:var(--panel2);cursor:pointer;font-size:1.2rem}
+@media (min-width:48rem){
+  main{padding:2rem 1rem}
+  .card{padding:1.75rem}
+  .rbody{padding:1.4rem 1.75rem 1.75rem}
+  .band{padding:1.4rem 1.75rem}
+}
+@media (prefers-reduced-motion:reduce){.card,.dot{transition:none}}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="brand">
+    <h1>Stat Test <span>Picker</span></h1>
+    <a href="https://augustineiacopelli.github.io/appaday/">AppADay portfolio</a>
+  </div>
+  <button class="gear" id="gearBtn" type="button" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+</header>
+
+<main>
+  <div class="wrap">
+    <p class="intro" id="intro">Answer a few plain language questions about your study. You will get the test to run, what it assumes, and what to switch to if those assumptions fail.</p>
+    <div class="topbar">
+      <button class="back" id="backBtn" type="button" hidden>&#8592; Back</button>
+      <div class="dots" id="dots" aria-label="Progress"></div>
+    </div>
+    <div class="stage" id="stage" aria-live="polite"></div>
+    <div id="after" hidden>
+      <div class="actions">
+        <button class="btn primary" id="copyBtn" type="button">Copy Result</button>
+        <button class="btn" id="restartBtn" type="button">Start Over</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="rememberChk"> Remember my last path on this device</label>
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="ftr">
+  AppADay 190 &middot; <a href="https://augustineiacopelli.github.io/appaday/">AppADay portfolio</a> &middot; A teaching aid, not a substitute for a statistician.
+</footer>
+
+<dialog id="settingsDlg" aria-labelledby="setTitle">
+  <div class="dlg-h">
+    <h2 id="setTitle">Settings</h2>
+    <button class="x" id="closeSettings" type="button" aria-label="Close settings">&times;</button>
+  </div>
+  <div class="dlg-b">
+    <div class="field">
+      <label for="sessionName">Session name (added to copied results)</label>
+      <input id="sessionName" type="text" maxlength="60" placeholder="e.g. Psych 301 lab 4" autocomplete="off">
+    </div>
+    <div id="keyMount"></div>
+  </div>
+</dialog>
+
+<script>
+// ============================================================
+//  MODEL TIER (resolved through the portal models.js)
+// ============================================================
+async function getModel(tier) {
+  try {
+    if (window.AppModels) { var m = await window.AppModels.get(tier); if (m) return m; }
+  } catch (e) {}
+  return (typeof window !== 'undefined' && window.AppModels) ? window.AppModels.id(tier) : '';
+}
+
+// ============================================================
+//  DATA LAYER
+// ============================================================
+var TESTS = Object.freeze({
+  oneSampleT: { name: 'One-sample t-test',
+    rationale: 'You are comparing one group\u2019s mean on a continuous measure against a known or target value.',
+    assumptions: ['Observations are independent', 'The outcome is continuous', 'Roughly normal, or n of at least 30', 'No extreme outliers'],
+    fallback: 'wilcoxonSR',
+    whyNot: 'Not a z-test, because the population standard deviation is almost never known and the t-test estimates it from your sample.' },
+  welchT: { name: 'Welch\u2019s t-test',
+    rationale: 'You are comparing the means of two separate groups on a continuous outcome, without assuming equal variances.',
+    assumptions: ['Two independent groups', 'The outcome is continuous', 'Roughly normal within each group, or n of at least 30 per group', 'No extreme outliers'],
+    fallback: 'mannWhitney',
+    whyNot: 'Not Student\u2019s t-test by default, because Welch loses almost nothing when variances are equal and protects you when they are not.' },
+  studentT: { name: 'Student\u2019s t-test (pooled)',
+    rationale: 'You are comparing the means of two separate groups on a continuous outcome and the variances look equal.',
+    assumptions: ['Two independent groups', 'The outcome is continuous', 'Roughly normal within each group, or n of at least 30 per group', 'Equal variances across groups'],
+    fallback: 'mannWhitney',
+    whyNot: 'Not a paired t-test, because the two groups contain different people or units.' },
+  pairedT: { name: 'Paired t-test',
+    rationale: 'You measured the same units twice, or matched pairs, and want to know whether the average difference is zero.',
+    assumptions: ['Each pair is independent of the other pairs', 'The differences are continuous', 'Differences roughly normal, or n of at least 30 pairs', 'No extreme outliers in the differences'],
+    fallback: 'wilcoxonSR',
+    whyNot: 'Not an independent t-test, because the two measurements in each pair are linked and the pairing removes person to person noise.' },
+  oneWayAnova: { name: 'One-way ANOVA',
+    rationale: 'You are comparing the means of three or more separate groups on a continuous outcome.',
+    assumptions: ['Independent groups', 'The outcome is continuous', 'Roughly normal within each group, or n of at least 30 per group', 'Similar variances across groups', 'No extreme outliers'],
+    fallback: 'kruskalWallis',
+    whyNot: 'Not several t-tests, because running every pair separately inflates the chance of a false positive. Follow a significant result with a post hoc test such as Tukey.' },
+  welchAnova: { name: 'Welch\u2019s ANOVA',
+    rationale: 'You are comparing three or more independent group means and the group variances look unequal.',
+    assumptions: ['Independent groups', 'The outcome is continuous', 'Roughly normal within each group, or n of at least 30 per group'],
+    fallback: 'kruskalWallis',
+    whyNot: 'Not the classic ANOVA when group spreads differ a lot, especially with unequal group sizes. Use Games-Howell for follow up comparisons.' },
+  rmAnova: { name: 'Repeated measures ANOVA',
+    rationale: 'You measured the same units under three or more conditions or time points on a continuous outcome.',
+    assumptions: ['Subjects are independent of each other', 'The outcome is continuous', 'Roughly normal at each level, or n of at least 30', 'Sphericity (check Mauchly and apply Greenhouse-Geisser if it fails)'],
+    fallback: 'friedman',
+    whyNot: 'Not a one-way ANOVA, because that would treat repeated scores from one person as if they came from different people.' },
+  wilcoxonSR: { name: 'Wilcoxon signed-rank test',
+    rationale: 'You have paired or single-sample data that are ranked, skewed, small, or outlier prone, so the test works on signed ranks instead of means.',
+    assumptions: ['Pairs (or observations) are independent', 'The outcome is at least ordinal', 'Differences are roughly symmetric around the median'],
+    fallback: null,
+    whyNot: 'Not the t-test, because your data do not meet the normality or outlier conditions, or the outcome is ordinal.' },
+  mannWhitney: { name: 'Mann-Whitney U test',
+    rationale: 'You are comparing two separate groups on an outcome that is ordinal, skewed, small, or outlier prone, using ranks instead of means.',
+    assumptions: ['Two independent groups', 'The outcome is at least ordinal', 'Similar distribution shapes if you want to talk about medians'],
+    fallback: null,
+    whyNot: 'Not a t-test, because your data do not meet the normality or outlier conditions, or the outcome is ordinal.' },
+  kruskalWallis: { name: 'Kruskal-Wallis test',
+    rationale: 'You are comparing three or more separate groups on an ordinal or non-normal outcome using ranks.',
+    assumptions: ['Independent groups', 'The outcome is at least ordinal', 'Similar distribution shapes if you want to talk about medians'],
+    fallback: null,
+    whyNot: 'Not one-way ANOVA, because your data do not meet the normality or outlier conditions, or the outcome is ordinal. Follow up with Dunn\u2019s test.' },
+  friedman: { name: 'Friedman test',
+    rationale: 'You measured the same units under three or more conditions and the outcome is ordinal or not normal, so the test ranks within each subject.',
+    assumptions: ['Subjects are independent of each other', 'The outcome is at least ordinal', 'Each subject is measured in every condition'],
+    fallback: null,
+    whyNot: 'Not repeated measures ANOVA, because your data do not meet the normality or outlier conditions, or the outcome is ordinal.' },
+  chiGof: { name: 'Chi-square goodness of fit',
+    rationale: 'You have counts in categories for one sample and want to see whether they match an expected or known distribution.',
+    assumptions: ['Observations are independent', 'Each observation falls in exactly one category', 'Every expected count is at least 5'],
+    fallback: null,
+    whyNot: 'Not a test of independence, because you have one categorical variable compared to known proportions, not two variables.' },
+  chiIndep: { name: 'Chi-square test of independence',
+    rationale: 'You are asking whether two categorical variables are associated, using counts in a contingency table.',
+    assumptions: ['Observations are independent (no person counted twice)', 'Each observation falls in exactly one cell', 'Every expected count is at least 5'],
+    fallback: 'fisherExact',
+    whyNot: 'Not McNemar, because the groups are independent rather than the same people measured twice.' },
+  fisherExact: { name: 'Fisher\u2019s exact test',
+    rationale: 'You have a small two by two (or small) table where some expected counts fall under 5, so the exact probability is computed directly.',
+    assumptions: ['Observations are independent', 'Each observation falls in exactly one cell', 'Row and column totals treated as fixed'],
+    fallback: null,
+    whyNot: 'Not chi-square, because its approximation breaks down when expected counts are under 5.' },
+  mcnemar: { name: 'McNemar\u2019s test',
+    rationale: 'You have a yes or no outcome measured twice on the same people, such as before and after, and want to know whether it changed.',
+    assumptions: ['Paired observations on the same units', 'A two category outcome', 'Pairs are independent of each other'],
+    fallback: null,
+    whyNot: 'Not chi-square of independence, because the before and after answers come from the same people. Use the exact (binomial) version when discordant pairs are few.' },
+  cochranQ: { name: 'Cochran\u2019s Q test',
+    rationale: 'You have a yes or no outcome measured on the same people under three or more conditions.',
+    assumptions: ['Repeated binary outcome on the same units', 'Subjects are independent of each other', 'A reasonable number of subjects'],
+    fallback: null,
+    whyNot: 'Not McNemar, which handles only two conditions. Follow a significant Q with pairwise McNemar tests and a correction.' },
+  pearsonRegression: { name: 'Pearson correlation / linear regression',
+    rationale: 'You want the strength and direction of a straight line relationship between two continuous variables.',
+    assumptions: ['Pairs are independent', 'Both variables continuous', 'The relationship looks linear in a scatterplot', 'Roughly normal, or n of at least 30', 'No extreme outliers'],
+    fallback: 'spearman',
+    whyNot: 'Not a group comparison, because neither variable defines groups. Remember that correlation is not causation.' },
+  spearman: { name: 'Spearman rank correlation',
+    rationale: 'You want a relationship between two variables where at least one is ordinal, or the data are skewed or outlier prone, so ranks are correlated.',
+    assumptions: ['Pairs are independent', 'Both variables at least ordinal', 'The relationship is monotonic (always rising or always falling)'],
+    fallback: null,
+    whyNot: 'Not Pearson, because your data are ordinal or do not meet the normality or outlier conditions.' }
+});
+
+var QUESTIONS = [
+  { id: 'goal', label: 'Goal',
+    prompt: function () { return 'What are you trying to do?'; },
+    parts: function () { return [{ key: 'goal', options: [
+      { value: 'compare', label: 'Compare groups', help: 'Do groups, conditions, or time points differ?' },
+      { value: 'relate', label: 'Find a relationship', help: 'Do two measures move together?' },
+      { value: 'known', label: 'Compare to a known value', help: 'Does one sample differ from a target, norm, or expected split?' }
+    ] }]; },
+    showIf: function () { return true; } },
+  { id: 'outcome', label: 'Outcome',
+    prompt: function (a) { return a.goal === 'relate' ? 'What kind of data are your two variables?' : 'What kind of data is your outcome?'; },
+    parts: function (a) {
+      if (a.goal === 'relate') return [{ key: 'outcome', options: [
+        { value: 'cc', label: 'Both continuous', help: 'Both are measured numbers, like height and weight.' },
+        { value: 'ord', label: 'At least one is ordinal', help: 'One or both are ranks or ordered scales, like a 1 to 5 rating.' },
+        { value: 'cat', label: 'Both categorical', help: 'Both sort people into labeled groups, like major and yes or no.' }
+      ] }];
+      return [{ key: 'outcome', options: [
+        { value: 'continuous', label: 'Continuous', help: 'A measured number, like a test score, time, or weight.' },
+        { value: 'ordinal', label: 'Ordinal', help: 'Ordered categories or ranks, like a 1 to 5 rating.' },
+        { value: 'categorical', label: 'Categorical', help: 'Labels or counts, like yes or no, or which brand.' }
+      ] }];
+    },
+    showIf: function () { return true; } },
+  { id: 'groups', label: 'Groups',
+    prompt: function () { return 'How many groups or conditions are you comparing?'; },
+    parts: function () { return [{ key: 'groups', options: [
+      { value: 'two', label: 'Two', help: 'For example treatment and control, or before and after.' },
+      { value: 'three', label: 'Three or more', help: 'For example three teaching methods, or four time points.' }
+    ] }]; },
+    showIf: function (a) { return a.goal === undefined || a.goal === 'compare'; } },
+  { id: 'design', label: 'Design',
+    prompt: function () { return 'Are the groups made of different people, or the same people?'; },
+    parts: function () { return [{ key: 'design', options: [
+      { value: 'indep', label: 'Independent', help: 'Different people or units in each group.' },
+      { value: 'paired', label: 'Paired or repeated', help: 'The same people measured more than once, or matched pairs.' }
+    ] }]; },
+    showIf: function (a) { return a.goal === undefined || a.goal === 'compare'; } },
+  { id: 'assumptions', label: 'Assumptions',
+    prompt: function (a) { return isContinuous(a) ? 'A quick check on your data' : 'A quick check on your counts'; },
+    parts: function (a) {
+      if (isContinuous(a)) return [
+        { key: 'n30', title: 'Do you have at least 30 observations per group?', row: true, options: [
+          { value: 'yes', label: 'Yes', help: '30 or more' }, { value: 'no', label: 'No', help: 'Under 30' }] },
+        { key: 'normal', title: 'Does the data look roughly normal (a bell shape)?', row: true, options: [
+          { value: 'yes', label: 'Yes', help: 'Bell shaped' }, { value: 'no', label: 'No', help: 'Skewed or odd' }, { value: 'unsure', label: 'Not sure', help: 'Have not checked' }] },
+        { key: 'outliers', title: 'Are there extreme outliers?', row: true, options: [
+          { value: 'yes', label: 'Yes', help: 'Some values far out' }, { value: 'no', label: 'No', help: 'Nothing wild' }] }
+      ];
+      return [{ key: 'smallExp', title: 'Would any expected count be under 5?', options: [
+        { value: 'yes', label: 'Yes, some cells are small', help: 'A small sample or a rare category.' },
+        { value: 'no', label: 'No, every cell has 5 or more expected', help: 'Plenty of observations in each cell.' }] }];
+    },
+    showIf: function (a) {
+      if (a.outcome === undefined) return true;
+      if (isContinuous(a)) return true;
+      if (a.outcome === 'cat') return true;
+      if (a.outcome === 'categorical') return !(a.goal === 'compare' && a.design === 'paired');
+      return false;
+    } }
+];
+
+function isContinuous(a) { return a.outcome === 'continuous' || a.outcome === 'cc'; }
+
+function stepKeys(q, a) { return q.parts(a).map(function (p) { return p.key; }); }
+function visibleSteps(a) { return QUESTIONS.filter(function (q) { return q.showIf(a); }); }
+function stepComplete(q, a) { return stepKeys(q, a).every(function (k) { return a[k] !== undefined; }); }
+function labelFor(q, a, key) {
+  var parts = q.parts(a);
+  for (var i = 0; i < parts.length; i++) if (parts[i].key === key) {
+    for (var j = 0; j < parts[i].options.length; j++) if (parts[i].options[j].value === a[key]) return parts[i].options[j].label;
+  }
+  return '';
+}
+
+// ============================================================
+//  DECISION FUNCTION (pure)
+// ============================================================
+function decide(a) {
+  var nonparam = a.outcome === 'ordinal' || a.outcome === 'ord' ||
+    (a.n30 === 'no' && (a.normal === 'no' || a.normal === 'unsure')) || a.outliers === 'yes';
+  var small = a.smallExp === 'yes';
+  var primary = null, alternative = null, note = null;
+
+  function pick(param, nonp, alt) {
+    if (nonparam) { primary = nonp; alternative = param; }
+    else { primary = param; alternative = alt || null; }
+  }
+
+  if (a.goal === 'known') {
+    if (a.outcome === 'categorical') {
+      primary = 'chiGof';
+      if (small) note = 'Some expected counts are under 5. Combine sparse categories or use an exact binomial or multinomial test.';
+    } else pick('oneSampleT', 'wilcoxonSR');
+  } else if (a.goal === 'compare') {
+    var two = a.groups === 'two', paired = a.design === 'paired';
+    if (a.outcome === 'categorical') {
+      if (paired) primary = two ? 'mcnemar' : 'cochranQ';
+      else if (two && small) { primary = 'fisherExact'; alternative = 'chiIndep'; }
+      else {
+        primary = 'chiIndep';
+        if (small) note = 'With three or more groups and small expected counts, combine sparse categories or use the Fisher-Freeman-Halton extension of Fisher\u2019s exact test.';
+      }
+    } else if (two && !paired) pick('welchT', 'mannWhitney', 'studentT');
+    else if (two && paired) pick('pairedT', 'wilcoxonSR');
+    else if (!paired) pick('oneWayAnova', 'kruskalWallis', 'welchAnova');
+    else pick('rmAnova', 'friedman');
+  } else if (a.goal === 'relate') {
+    if (a.outcome === 'cat') {
+      if (small) { primary = 'fisherExact'; alternative = 'chiIndep'; }
+      else primary = 'chiIndep';
+    } else if (a.outcome === 'ord') { primary = 'spearman'; alternative = null; }
+    else pick('pearsonRegression', 'spearman');
+  }
+
+  var path = [];
+  visibleSteps(a).forEach(function (q) {
+    var keys = stepKeys(q, a), bits = [];
+    keys.forEach(function (k) {
+      if (a[k] === undefined) return;
+      var lab = labelFor(q, a, k);
+      if (k === 'n30') lab = a[k] === 'yes' ? 'n 30+' : 'n under 30';
+      else if (k === 'normal') lab = a[k] === 'yes' ? 'normal' : (a[k] === 'no' ? 'not normal' : 'normality unsure');
+      else if (k === 'outliers') lab = a[k] === 'yes' ? 'outliers' : 'no outliers';
+      else if (k === 'smallExp') lab = a[k] === 'yes' ? 'small expected counts' : 'expected counts 5+';
+      bits.push(lab);
+    });
+    if (bits.length) path.push({ step: q.id, title: q.label, label: bits.join(', ') });
+  });
+
+  return { primary: primary, alternative: alternative, path: path, note: note };
+}
+
+// ============================================================
+//  CLAUDE (optional rationale)
+// ============================================================
+var THINKING_OPTIONS = [{ type: 'between_tools' }, { type: 'disabled' }, null];
+var thinkingFor = {};
+async function callClaude(model, system, prompt, apiKey) {
+  var start = thinkingFor[model] != null ? thinkingFor[model] : 0;
+  var lastErr = null;
+  for (var i = start; i < THINKING_OPTIONS.length; i++) {
+    var body = { model: model, max_tokens: 1000, system: system, messages: [{ role: 'user', content: prompt }] };
+    if (THINKING_OPTIONS[i]) body.thinking = THINKING_OPTIONS[i];
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify(body)
+    });
+    var j = await r.json().catch(function () { return {}; });
+    if (r.ok) { thinkingFor[model] = i; return j; }
+    var msg = (j.error && j.error.message) || ('HTTP ' + r.status);
+    lastErr = new Error(msg);
+    if (!(r.status === 400 && /thinking/i.test(msg))) throw lastErr;
+  }
+  throw lastErr;
+}
+
+var SYSTEM_PROMPT = 'You explain statistics to an introductory statistics student. The statistical test has already been chosen; do not question, change, or offer alternatives to it. Using the student\u2019s answers, explain in two or three plain sentences why this test fits their study. No headings, no lists, no formulas.';
+
+// ============================================================
+//  UI (browser only)
+// ============================================================
+if (typeof document !== 'undefined') (function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var LS = { remember: 'appaday190.remember', last: 'appaday190.last', session: 'appaday190.session' };
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  var answers = {};
+  var current = 'goal';   // step id, or 'result'
+  var aiModel = '';
+  var aiCache = {};
+  var renderToken = 0;
+
+  function clearAfter(stepId) {
+    var idx = QUESTIONS.findIndex(function (q) { return q.id === stepId; });
+    var keep = {};
+    var allowed = [];
+    for (var j = 0; j <= idx; j++) allowed = allowed.concat(stepKeys(QUESTIONS[j], answers));
+    allowed.forEach(function (k) { if (answers[k] !== undefined) keep[k] = answers[k]; });
+    answers = keep;
+  }
+  function clearStep(stepId) {
+    var q = QUESTIONS.find(function (x) { return x.id === stepId; });
+    var idx = QUESTIONS.indexOf(q);
+    var keep = {};
+    var allowed = [];
+    for (var j = 0; j < idx; j++) allowed = allowed.concat(stepKeys(QUESTIONS[j], answers));
+    allowed.forEach(function (k) { if (answers[k] !== undefined) keep[k] = answers[k]; });
+    answers = keep;
+  }
+  function nextStep() {
+    var vis = visibleSteps(answers);
+    for (var i = 0; i < vis.length; i++) if (!stepComplete(vis[i], answers)) return vis[i].id;
+    return 'result';
+  }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function renderDots() {
+    var dots = $('dots'); dots.textContent = '';
+    var vis = visibleSteps(answers);
+    vis.forEach(function (q) {
+      var d = el('span', 'dot');
+      if (q.id === current) d.className += ' now';
+      else if (stepComplete(q, answers)) d.className += ' done';
+      dots.appendChild(d);
+    });
+    var r = el('span', 'dot'); if (current === 'result') r.className += ' now'; dots.appendChild(r);
+    var idx = vis.findIndex(function (q) { return q.id === current; });
+    dots.setAttribute('aria-label', current === 'result' ? 'Result' : 'Question ' + (idx + 1) + ' of ' + vis.length);
+  }
+
+  function swap(build) {
+    var stage = $('stage');
+    var old = stage.firstChild;
+    var go = function () {
+      stage.textContent = '';
+      var card = build();
+      card.classList.add('fade');
+      stage.appendChild(card);
+      requestAnimationFrame(function () { requestAnimationFrame(function () { card.classList.remove('fade'); }); });
+      var focusEl = card.querySelector('h2, .prompt');
+      if (focusEl) { focusEl.setAttribute('tabindex', '-1'); focusEl.focus({ preventScroll: true }); }
+    };
+    if (old && old.classList) { old.classList.add('fade'); setTimeout(go, 180); } else go();
+  }
+
+  function render() {
+    renderDots();
+    var vis = visibleSteps(answers);
+    var isFirst = current === vis[0].id;
+    $('backBtn').hidden = isFirst;
+    $('after').hidden = current !== 'result';
+    $('intro').hidden = current !== 'goal' || Object.keys(answers).length > 0;
+    if (current === 'result') swap(buildResult); else swap(buildQuestion);
+  }
+
+  function buildQuestion() {
+    var q = QUESTIONS.find(function (x) { return x.id === current; });
+    var vis = visibleSteps(answers);
+    var idx = vis.indexOf(q);
+    var card = el('section', 'card');
+    card.appendChild(el('p', 'step-label', 'Step ' + (idx + 1) + ' of ' + vis.length + ' \u00B7 ' + q.label));
+    card.appendChild(el('h2', 'prompt', q.prompt(answers)));
+    var parts = q.parts(answers);
+    var multi = parts.length > 1 || !!parts[0].title;
+    var nextBtn = null;
+    if (multi) {
+      nextBtn = el('button', 'next', 'See my test'); nextBtn.type = 'button';
+      nextBtn.disabled = !stepComplete(q, answers);
+      nextBtn.addEventListener('click', function () { advance(); });
+    }
+    parts.forEach(function (p) {
+      if (p.title) card.appendChild(el('p', 'sub', p.title));
+      var wrap = el('div', 'opts' + (p.row ? ' row' : ''));
+      wrap.setAttribute('role', 'group');
+      if (p.title) wrap.setAttribute('aria-label', p.title);
+      p.options.forEach(function (o) {
+        var b = el('button', 'opt'); b.type = 'button';
+        b.setAttribute('aria-pressed', answers[p.key] === o.value ? 'true' : 'false');
+        b.appendChild(el('b', null, o.label));
+        if (o.help) b.appendChild(el('span', 'help', o.help));
+        b.addEventListener('click', function () { choose(q, p.key, o.value, multi, wrap, b, nextBtn); });
+        wrap.appendChild(b);
+      });
+      card.appendChild(wrap);
+    });
+    if (nextBtn) card.appendChild(nextBtn);
+    return card;
+  }
+
+  function choose(q, key, value, multi, wrap, btn, nextBtn) {
+    var changed = answers[key] !== value;
+    if (changed) {
+      // every later step depended on the old answer, so drop those answers
+      clearAfter(q.id);
+      answers[key] = value;
+    }
+    Array.prototype.forEach.call(wrap.children, function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+    if (multi) {
+      if (nextBtn) nextBtn.disabled = !stepComplete(q, answers);
+      renderDots();
+      return;
+    }
+    setTimeout(advance, 160);
+  }
+
+  function advance() {
+    current = nextStep();
+    if (current === 'result') saveLast();
+    render();
+  }
+
+  function goBack() {
+    var vis = visibleSteps(answers);
+    if (current === 'result') {
+      var lastStep = vis[vis.length - 1];
+      current = lastStep.id;
+      render(); return;
+    }
+    var idx = vis.findIndex(function (q) { return q.id === current; });
+    if (idx <= 0) return;
+    clearStep(current);
+    current = vis[idx - 1].id;
+    render();
+  }
+
+  function jumpTo(stepId) { current = stepId; render(); }
+
+  function buildResult() {
+    var d = decide(answers);
+    var t = TESTS[d.primary];
+    var card = el('section', 'card result');
+    var band = el('div', 'band');
+    band.appendChild(el('div', 'k', 'Your test'));
+    band.appendChild(el('h2', null, t.name));
+    if (d.alternative) {
+      var altText = (TESTS[d.alternative].name === TESTS[d.primary].name) ? '' :
+        'Also consider: ' + TESTS[d.alternative].name + altReason(d);
+      if (altText) band.appendChild(el('div', 'alt', altText));
+    }
+    card.appendChild(band);
+    var body = el('div', 'rbody');
+
+    var s1 = el('div', 'sec'); s1.appendChild(el('h3', null, 'Why this test'));
+    var why = el('p', 'why'); why.textContent = t.rationale; s1.appendChild(why);
+    var muted = el('p', 'muted', 'Offline explanation.'); muted.hidden = true; s1.appendChild(muted);
+    body.appendChild(s1);
+
+    if (d.note) { var n = el('p', 'note', d.note); body.appendChild(n); }
+
+    var s2 = el('div', 'sec'); s2.appendChild(el('h3', null, 'Assumptions checklist'));
+    var ul = el('ul', 'checks');
+    t.assumptions.forEach(function (txt, i) {
+      var li = el('li'); var lab = el('label'); var cb = el('input'); cb.type = 'checkbox'; cb.id = 'as' + i;
+      lab.appendChild(cb); lab.appendChild(el('span', null, txt)); li.appendChild(lab); ul.appendChild(li);
+    });
+    s2.appendChild(ul); body.appendChild(s2);
+
+    var s3 = el('div', 'sec'); s3.appendChild(el('h3', null, 'Fallback'));
+    var fb = el('p', 'fb');
+    if (t.fallback) {
+      var st = el('strong', null, TESTS[t.fallback].name);
+      fb.appendChild(st);
+      fb.appendChild(document.createTextNode(' ' + switchLine(d.primary, t.fallback)));
+    } else fb.textContent = fallbackNone(d.primary);
+    s3.appendChild(fb); body.appendChild(s3);
+
+    var s4 = el('div', 'sec'); s4.appendChild(el('h3', null, 'Why not something else'));
+    s4.appendChild(el('p', 'fb', t.whyNot)); body.appendChild(s4);
+
+    var s5 = el('div', 'sec'); s5.appendChild(el('h3', null, 'Your path (tap to change)'));
+    var chips = el('div', 'chips');
+    d.path.forEach(function (p) {
+      var c = el('button', 'chip'); c.type = 'button';
+      c.appendChild(el('small', null, p.title));
+      c.appendChild(document.createTextNode(p.label));
+      c.setAttribute('aria-label', 'Change ' + p.title + ': ' + p.label);
+      c.addEventListener('click', function () { jumpTo(p.step); });
+      chips.appendChild(c);
+    });
+    s5.appendChild(chips); body.appendChild(s5);
+    card.appendChild(body);
+
+    explain(d, t, why, muted);
+    return card;
+  }
+
+  function altReason(d) {
+    if (d.primary === 'welchT' && d.alternative === 'studentT') return ' if the two group variances are clearly equal.';
+    if (d.primary === 'oneWayAnova' && d.alternative === 'welchAnova') return ' if group spreads differ a lot.';
+    if (d.primary === 'fisherExact') return ' once every expected count reaches 5.';
+    return ' if your data turn out normal with no extreme outliers.';
+  }
+  function switchLine(primary, fb) {
+    if (fb === 'fisherExact') return 'if any expected count turns out under 5.';
+    return 'if you find skew or extreme outliers with fewer than 30 per group, or the outcome turns out to be ranks.';
+  }
+  function fallbackNone(primary) {
+    if (['wilcoxonSR', 'mannWhitney', 'kruskalWallis', 'friedman', 'spearman'].indexOf(primary) >= 0) return 'This is already the rank based fallback, so there is nothing more robust to switch to.';
+    if (primary === 'fisherExact') return 'This is already the exact test, so small counts are handled.';
+    if (primary === 'mcnemar') return 'With few discordant pairs, run the exact binomial version of McNemar.';
+    if (primary === 'cochranQ') return 'With very few subjects, consider an exact permutation version of Q.';
+    return 'If expected counts drop under 5, combine sparse categories or use an exact test.';
+  }
+
+  async function explain(d, t, whyEl, mutedEl) {
+    var token = ++renderToken;
+    var cacheKey = JSON.stringify(answers) + '|' + d.primary;
+    function showAI(text) {
+      whyEl.textContent = '';
+      whyEl.appendChild(el('span', 'badge', 'AI'));
+      whyEl.appendChild(document.createTextNode(text));
+      mutedEl.hidden = true;
+    }
+    function offline() { if (token === renderToken) mutedEl.hidden = false; }
+    if (aiCache[cacheKey]) { showAI(aiCache[cacheKey]); return; }
+    try {
+      if (!window.AppKeys || !window.AppKeys.has()) { offline(); return; }
+      var model = aiModel || await getModel('haiku');
+      if (!model) { offline(); return; }
+      var apiKey = await window.AppKeys.get();
+      if (!apiKey) { offline(); return; }
+      var user = JSON.stringify({ answers: answers, test: t.name });
+      var j = await callClaude(model, SYSTEM_PROMPT, user, apiKey);
+      var text = (j.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join(' ').trim();
+      if (!text) throw new Error('empty reply (' + j.stop_reason + ')');
+      aiCache[cacheKey] = text;
+      if (token !== renderToken || !whyEl.isConnected) return;
+      showAI(text);
+    } catch (e) { offline(); }
+  }
+
+  function resultText() {
+    var d = decide(answers), t = TESTS[d.primary];
+    var lines = [];
+    var sess = lsGet(LS.session);
+    if (sess) lines.push('Session: ' + sess);
+    lines.push('Recommended test: ' + t.name);
+    if (d.alternative) lines.push('Also consider: ' + TESTS[d.alternative].name);
+    var whyNode = document.querySelector('.why');
+    lines.push('Why: ' + (whyNode ? whyNode.textContent.replace(/^AI/, '').trim() : t.rationale));
+    if (d.note) lines.push('Note: ' + d.note);
+    lines.push('Assumptions: ' + t.assumptions.join('; '));
+    lines.push('Fallback: ' + (t.fallback ? TESTS[t.fallback].name : 'none needed'));
+    lines.push('Why not: ' + t.whyNot);
+    lines.push('Path: ' + d.path.map(function (p) { return p.title + ' = ' + p.label; }).join(' > '));
+    lines.push('Stat Test Picker, AppADay 190: https://augustineiacopelli.github.io/appaday-190-stat-test-picker/');
+    return lines.join('\n');
+  }
+
+  async function copyResult() {
+    var text = resultText();
+    var ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'absolute'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+      document.body.removeChild(ta);
+    }
+    toast(ok ? 'Result copied.' : 'Copy was blocked by the browser.');
+  }
+  var toastTimer = null;
+  function toast(msg) { $('toast').textContent = msg; clearTimeout(toastTimer); toastTimer = setTimeout(function () { $('toast').textContent = ''; }, 2600); }
+
+  function saveLast() { if ($('rememberChk').checked) lsSet(LS.last, JSON.stringify(answers)); }
+
+  function restart() { answers = {}; current = 'goal'; renderToken++; render(); }
+
+  function init() {
+    $('backBtn').addEventListener('click', goBack);
+    $('copyBtn').addEventListener('click', copyResult);
+    $('restartBtn').addEventListener('click', restart);
+    $('rememberChk').checked = lsGet(LS.remember) === '1';
+    $('rememberChk').addEventListener('change', function () {
+      if (this.checked) { lsSet(LS.remember, '1'); if (current === 'result') lsSet(LS.last, JSON.stringify(answers)); }
+      else { lsDel(LS.remember); lsDel(LS.last); }
+    });
+    $('gearBtn').addEventListener('click', function () {
+      $('sessionName').value = lsGet(LS.session) || '';
+      if (window.AppKeys) window.AppKeys.mountSettings($('keyMount'));
+      $('settingsDlg').showModal();
+    });
+    $('closeSettings').addEventListener('click', function () { $('settingsDlg').close(); });
+    $('settingsDlg').addEventListener('click', function (e) { if (e.target === this) this.close(); });
+    $('sessionName').addEventListener('input', function () {
+      var v = this.value.trim(); if (v) lsSet(LS.session, v); else lsDel(LS.session);
+    });
+
+    if ($('rememberChk').checked) {
+      try {
+        var saved = JSON.parse(lsGet(LS.last) || 'null');
+        if (saved && typeof saved === 'object') { answers = saved; current = nextStep(); }
+      } catch (e) { answers = {}; current = 'goal'; }
+    }
+    render();
+  }
+
+  async function initAI() {
+    try { var CLAUDE_MODEL = await getModel('haiku'); aiModel = CLAUDE_MODEL; } catch (e) { aiModel = ''; }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { init(); initAI(); });
+})();
+</script>
+</body>
+</html>
